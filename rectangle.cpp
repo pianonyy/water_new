@@ -26,19 +26,19 @@ rectangle::rectangle(const vec3& p1, const vec3& p2) {
             left_point = p1;
         }
 
-        /* Vectors for Right Face */
+
         corner_points[0] = vec3(right_point.x + width, right_point.y - width, right_point.z + width);
         corner_points[1] = vec3(right_point.x + width, right_point.y - width, right_point.z - width);
         corner_points[2] = vec3(right_point.x + width, right_point.y + width, right_point.z + width);
         corner_points[3] = vec3(right_point.x + width, right_point.y + width, right_point.z - width);
 
-        /* Vectors for Left Face */
+
         corner_points[4] = vec3(left_point.x - width, left_point.y - width, left_point.z + width);
         corner_points[5] = vec3(left_point.x - width, left_point.y - width, left_point.z - width);
         corner_points[6] = vec3(left_point.x - width, left_point.y + width, left_point.z + width);
         corner_points[7] = vec3(left_point.x - width, left_point.y + width, left_point.z - width);
 
-        /* Set up the face normals */
+        
         face_normals[0] = vec3(1, 0, 0);
         face_normals[1] = vec3(-1, 0, 0);
         face_normals[2] = vec3(0, 0, 1);

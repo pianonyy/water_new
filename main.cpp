@@ -312,22 +312,22 @@ int main() {
 
 
 
-        {
-
-
-            glMatrixMode(GL_PROJECTION_MATRIX);
-            glLoadIdentity();
-
-
-            glMatrixMode(GL_MODELVIEW_MATRIX);
-            glTranslatef(0, 0, -5);
-            drawCube();
-        }
+        // {
+        //
+        //
+        //     glMatrixMode(GL_PROJECTION_MATRIX);
+        //     glLoadIdentity();
+        //
+        //
+        //     glMatrixMode(GL_MODELVIEW_MATRIX);
+        //     glTranslatef(0, 0, -5);
+        //     drawCube();
+        // }
 
 
 
         /*
-         * Draw the box which contains the water
+         * Draw the box
          */
 
         {
@@ -341,29 +341,29 @@ int main() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-            // Draw floor of water
+
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
-            // Set up uniforms for side 1 of water
+
             model_mat = mat4::translation(vec3(0, -3, -1)) * mat4::scale(vec3(3, 1, 2)) * mat4::rotation_x(M_PI / 2.0);
             glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-            // Draw side 1 of water left
+
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
-            // Set up uniforms for side 2 of water
+
             model_mat = mat4::translation(vec3(-3, 0, -1)) * mat4::scale(vec3(1, 3, 2)) * mat4::rotation_y(M_PI / 2.0);
             glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-            // Draw side 2 of water right
+            
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
@@ -372,6 +372,10 @@ int main() {
 
 
         }
+
+        /*
+        draw the bortik
+        */
 
         {
 
@@ -492,7 +496,7 @@ int main() {
         if (is_drawing_continous) {
             glUseProgram(surface_shader.program);
 
-            // Set up uniforms for water surface
+
             mat4 model_mat = mat4::identity();
             glUniformMatrix4fv(surface_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glUniformMatrix4fv(surface_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
@@ -503,7 +507,7 @@ int main() {
             glActiveTexture(GL_TEXTURE1);
 
 
-            // Draw the water surface
+
             glBindVertexArray(water_surface.vao);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, water_surface.elements_vbo);
             glDrawElements(GL_TRIANGLES, (water_surface.N - 1) * (water_surface.N - 1) * 3 * 3, GL_UNSIGNED_INT, 0);

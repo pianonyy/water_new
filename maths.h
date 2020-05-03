@@ -8,10 +8,7 @@
 
 class mat4;
 
-/*
- * 3-D vectors
- */
-class vec3 
+class vec3
 {
     public:
         float x, y, z;
@@ -47,10 +44,7 @@ vec3 operator*(float c, const vec3 &u);
 
 vec3 operator*(const mat4 &m, const vec3 &u);
 
-/*
- * 4 x 4 matrices
- * Stored in row-order form
- */
+
 class mat4 {
     public:
         float m[16];

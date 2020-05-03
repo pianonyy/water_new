@@ -81,11 +81,9 @@ vec3 operator*(const mat4& m, const vec3& u) {
     return vec3(x, y, z);
 }
 
-/*
- * 4 x 4 matrices
- */
+
 mat4::mat4() {
-    // Default constructor creates an identity matrix
+
     make_zero();
     m[0] = 1;
     m[5] = 1;
@@ -358,4 +356,3 @@ void mat4::print() {
     printf("[%f, %f, %f, %f]\n", m[8], m[9], m[10], m[11]);
     printf("[%f, %f, %f, %f]\n", m[12], m[13], m[14], m[15]);
 }
-

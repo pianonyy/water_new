@@ -20,5 +20,5 @@ void main () {
 
    vec3 texel = texture(floor_texture, frag_texture_coord).xyz;
 
-   frag_color = 0.4 * vec4(0.527, 0.843, 0.898, 1.0) + kd * vec4(texel, 18.5);
+   frag_color = 0.4 * vec4(0.123, 0.123, 0.123, 1.0) + kd * vec4(texel, 18.5);
 }
