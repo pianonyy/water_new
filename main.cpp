@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-#define X .525731112119133606 
+#define X .525731112119133606
 #define Z .850650808352039932
 
 #include<iostream>
@@ -75,7 +75,7 @@ void drawCube()
 }
 
 int main() {
-    
+
     if (!glfwInit()) {
         fprintf(stderr, "Failed to init glfw");
     }
@@ -84,9 +84,9 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
     window = glfwCreateWindow(1000, 1000, "water_simulation", NULL, NULL);
-    if (window == NULL) { 
+    if (window == NULL) {
         std::cout << "Failed to open window!" << std::endl;
-        glfwTerminate(); 
+        glfwTerminate();
     }
 
     glfwMakeContextCurrent(window);
@@ -104,13 +104,13 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    
+
     vec3 cam_pos(7, 7, 4);
     vec3 cam_targ(0, 0, -2);
     vec3 cam_up(0, 0, 10);
 
- 
-    
+
+
 
     GLuint VertexBuffer, VertexArray, ElementBuffer, ShaderProgram;
 
@@ -157,7 +157,7 @@ int main() {
     graphics::shader floor_shader("floor.vert", "floor.frag");
     graphics::shader rectangle_shader("rectangle.vert", "rectangle.frag");
     graphics::shader cube_shader("cube.vert", "cube.frag");
-  
+
 
     /*
      * Set up all the objects we draw
@@ -165,14 +165,14 @@ int main() {
     object3d::rectangle rectangle(vec3(0, 0, 0), vec3(0, 0, 1));
     object3d::water_surface water_surface;
     object3d::plane plane;
-    object3d::sphere sphere(2.0,10,10);
+
 
     /*
      * Set up the textures
      */
     GLuint floor_texture = util_create_texture("floor2.jpg");
     GLuint cube_texture = util_create_texture("red.jpg");
-   
+
     /*
      * Initialize the shaders
      */
@@ -180,7 +180,7 @@ int main() {
     GLuint floor_texture_location = glGetUniformLocation(surface_shader.program, "floor_texture");
     glUniform1i(floor_texture_location, 0);
 
-    
+
     glUseProgram(0);
 
     float previous_time = glfwGetTime();
@@ -188,18 +188,18 @@ int main() {
     bool is_drawing_continous = true;
     bool is_Q_key_down = false;
 
-  
-   
 
-  
 
-    
+
+
+
+
     while (!glfwWindowShouldClose(window)) {
-      
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-        
+
+
         /*
          * Check if Q key was pressed and invert whether we are drawing continuously
          */
@@ -218,7 +218,7 @@ int main() {
          */
         float current_time = glfwGetTime();
         float elapsed_time = current_time - previous_time;
-        
+
         previous_time = current_time;
 
         /*
@@ -273,21 +273,21 @@ int main() {
                 is_mouse_down = false;
             }
         }
-        
 
-        
+
+
         /*
           Draw sphere inside the water
         */
         /*
-        {   
-            
+        {
+
             GLfloat x, y, z, alpha, beta;
             GLfloat radius = 60.0f;
             int gradation = 20;
             for (alpha = 0.0; alpha < M_PI; alpha += M_PI / gradation)
             {
-                
+
                 glDrawArrays(GL_TRIANGLES, 0, 18);
                 glColor3f(0.4, 0.5, 0.3);
                 for (beta = 0.0; beta < 2.01 * M_PI; beta += M_PI / gradation)
@@ -295,23 +295,23 @@ int main() {
                     x = radius * cos(beta) * sin(alpha);
                     y = radius * sin(beta) * sin(alpha);
                     z = radius * cos(alpha);
-                   
+
                     glVertex3f(x, y, z);
                     x = radius * cos(beta) * sin(alpha + M_PI / gradation);
                     y = radius * sin(beta) * sin(alpha + M_PI / gradation);
                     z = radius * cos(alpha + M_PI / gradation);
                     glVertex3f(x, y, z);
                 }
-               
+
             }
 
-            
+
 
         }
         */
 
 
-        
+
         {
 
 
@@ -323,13 +323,13 @@ int main() {
             glTranslatef(0, 0, -5);
             drawCube();
         }
-        
-        
+
+
 
         /*
          * Draw the box which contains the water
          */
-         
+
         {
             glUseProgram(floor_shader.program);
 
@@ -370,14 +370,14 @@ int main() {
 
             glUseProgram(0);
 
-          
+
         }
 
         {
 
 
-            
-       
+
+
 
 
             glUseProgram(cube_shader.program);
@@ -484,7 +484,7 @@ int main() {
 
             glUseProgram(0);
         }
-        
+
 
         /*
          * Draw a continous representation of the water surface
@@ -501,7 +501,7 @@ int main() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
             glActiveTexture(GL_TEXTURE1);
-           
+
 
             // Draw the water surface
             glBindVertexArray(water_surface.vao);
@@ -511,12 +511,12 @@ int main() {
 
             glUseProgram(0);
         }
-        
 
-    
 
-        
-        
+
+
+
+
 
         glfwPollEvents();
         glfwSwapBuffers(window);
