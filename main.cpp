@@ -120,7 +120,7 @@ int main() {
     GLuint floor_texture = util_create_texture("floor2.jpg");
     GLuint cube_texture = util_create_texture("red.jpg");
     GLuint flag_texture = util_create_texture("flag.jpg");
-    GLuint boat_texture = util_create_texture("core_boat.jpg");
+   
     /*
      * Initialize the shaders
      */
@@ -305,79 +305,7 @@ int main() {
             }
         }
 
-       /* {
-                glUseProgram(rectangle_shader.program);
 
-                
-
-                        vec3 position(2.58, 1, -1);
-                        vec3 scale(7.0, 10.0, 0.1);
-
-                        mat4 model_mat = mat4::translation(position) * mat4::scale(scale);
-
-                        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
-                        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-                        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-                        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
-
-                        glBindVertexArray(rectangle.vao);
-                        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
-                        glBindVertexArray(0);
-                    
-                
-
-                glUseProgram(0);
-        }*/
-
-        
-
-        
-        
-        /*
-          Draw sphere inside the water
-        */
-        
-        //{   glUseProgram(sphere_shader.program);
-        //   
-        //    glUniformMatrix4fv(floor_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-        //    glUniformMatrix4fv(floor_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
-        //    glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    GLfloat x, y, z, alpha, beta;
-        //    GLfloat radius = 60.0f;
-        //    int gradation = 20;
-        //    for (alpha = 0.0; alpha < M_PI; alpha += M_PI / gradation)
-        //    {
-        //        
-        //        
-        //        
-        //        for (beta = 0.0; beta < 2.01 * M_PI; beta += M_PI / gradation)
-        //        {
-        //            x = radius * cos(beta) * sin(alpha);
-        //            y = radius * sin(beta) * sin(alpha);
-        //            z = radius * cos(alpha);
-        //           
-        //            glBindVertexArray(x,y,z)
-        //            glVertex3f(x, y, z);
-        //            x = radius * cos(beta) * sin(alpha + M_PI / gradation);
-        //            y = radius * sin(beta) * sin(alpha + M_PI / gradation);
-        //            z = radius * cos(alpha + M_PI / gradation);
-        //            glVertex3f(x, y, z);
-        //            glDrawArrays(GL_TRIANGLES, 0, 18);
-        //        }
-        //       
-        //    }
-        //    glUseProgram(0);
-
-        //    
-
-        //}
-        
-
-
-        //
-
-        //
-        //
 
         /*
          * Draw the box which contains the water
@@ -426,85 +354,14 @@ int main() {
           
         }
 
-        //{
+        
 
 
-        //    
+          
        
 
 
-        //    glUseProgram(cube_shader.program);
-
-        //    mat4 model_mat = mat4::translation(vec3(-0.9, -0.9, -1.0)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-        //    glUniformMatrix4fv(cube_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m); // down
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-        //    // Draw floor of water
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
-        //    glBindVertexArray(0);
-
-        //    // Set up uniforms for side 1 of water
-        //    model_mat = mat4::translation(vec3(-0.9, -3, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-        //    // Draw side 1 of water left far
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-        //    glBindVertexArray(0);
-
-        //    //// Set up uniforms for side 2 of water
-        //    model_mat = mat4::translation(vec3(-3.0, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-        //    // Draw side 2 of water right far
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-        //    glBindVertexArray(0);
-
-        //    //// Set up uniforms for side 2 of water
-        //    model_mat = mat4::translation(vec3(1.2, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-        //    // Draw side 2 of water right near
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-        //    glBindVertexArray(0);
-
-        //    // Set up uniforms for side 1 of water
-        //    model_mat = mat4::translation(vec3(-0.9, 1.2, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-
-        //    // Draw side 1 of water left near
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-        //    glBindVertexArray(0);
-
-        //    model_mat = mat4::translation(vec3(-0.9, -0.9, 1.2)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
-        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        //    glActiveTexture(GL_TEXTURE0);
-        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-
-        //    // Draw side 1 of water high
-        //    glBindVertexArray(plane.vao);
-        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-        //    glBindVertexArray(0);
-
-        //    glUseProgram(0);
-        //}
+        
 
         {
             glUseProgram(water_shader.program);
