@@ -1,15 +1,14 @@
 #include "shader.h"
-#pragma warning(disable : 4996)
 
 using namespace graphics;
 
-shader::shader(const char* vertex_shader_file, const char* fragment_shader_file) {
+shader::shader(const char *vertex_shader_file, const char *fragment_shader_file) {
     // Create the vertex shader
-    FILE* f = fopen(vertex_shader_file, "rb");
+    FILE *f = fopen(vertex_shader_file, "r");
     fseek(f, 0, SEEK_END);
-    int l = ftell(f);
+    int l = ftell(f); 
     fseek(f, 0, SEEK_SET);
-    char* vertex_shader_string = (char*)malloc(sizeof(char) * (l));
+    char *vertex_shader_string = (char*) malloc(sizeof(char) * (l + 1));
     fread(vertex_shader_string, sizeof(char), l, f);
     vertex_shader_string[l] = 0;
     fclose(f);
@@ -21,11 +20,11 @@ shader::shader(const char* vertex_shader_file, const char* fragment_shader_file)
     free(vertex_shader_string);
 
     // Create the fragment shader
-    f = fopen(fragment_shader_file, "rb");
+    f = fopen(fragment_shader_file, "r");
     fseek(f, 0, SEEK_END);
-    l = ftell(f);
+    l = ftell(f); 
     fseek(f, 0, SEEK_SET);
-    char* fragment_shader_string = (char*)malloc(sizeof(char) * (l));
+    char *fragment_shader_string = (char*) malloc(sizeof(char) * (l + 1));
     fread(fragment_shader_string, sizeof(char), l, f);
     fragment_shader_string[l] = 0;
     fclose(f);
@@ -41,7 +40,7 @@ shader::shader(const char* vertex_shader_file, const char* fragment_shader_file)
     glAttachShader(this->program, fragment_shader);
     glAttachShader(this->program, vertex_shader);
     glLinkProgram(this->program);
-
+    
     // Set up the uniform locations
     this->model_mat_location = glGetUniformLocation(this->program, "model_mat");
     this->view_mat_location = glGetUniformLocation(this->program, "view_mat");
@@ -49,11 +48,11 @@ shader::shader(const char* vertex_shader_file, const char* fragment_shader_file)
     this->color_location = glGetUniformLocation(this->program, "color");
 }
 
-void shader::check_for_compile_errors(GLuint shader, const char* name) {
+void shader::check_for_compile_errors(GLuint shader, const char *name) {
     int params = -1;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &params);
     if (params != GL_TRUE) {
-        char* log = (char*)malloc(sizeof(char) * 2048);
+        char *log = (char*) malloc(sizeof(char)*2048);
         int length;
         glGetShaderInfoLog(shader, 2048, &length, log);
 
