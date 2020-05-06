@@ -7,7 +7,7 @@ in vec2 frag_texture_coord;
 
 out vec4 frag_color;
 
-uniform sampler2D cube_texture;
+uniform sampler2D flag_texture;
 
 void main () {
    vec3 light_pos_1 = vec3(1.0, 2.0, 3.0);
@@ -18,8 +18,8 @@ void main () {
 
    kd = max(0.2, kd);
 
-   vec3 texel = texture(cube_texture, frag_texture_coord).xyz;
+   vec3 texel = texture(flag_texture, frag_texture_coord).xyz;
 
-   frag_color = 0 * vec4(0.527, 0.843, 0.898, 1.0) + kd * vec4(texel, 9.0);
+   frag_color =0.1 * vec4(0.923, 0.923, 0.923, 1.0) + kd * vec4(texel, 30.5);
 }
 
