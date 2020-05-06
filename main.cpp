@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-
+#define X .525731112119133606 
+#define Z .850650808352039932
 
 #include<iostream>
 #include <stdlib.h>
@@ -21,8 +22,15 @@
 
 
 
+GLFWwindow* window;
+void input() {
+    glfwPollEvents();
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+        glfwSetWindowShouldClose(window, 1);
+    }
 
 
+}
 
 
 
@@ -38,8 +46,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-    
-    GLFWwindow* window = glfwCreateWindow(1000, 1000, "water_simulation", NULL, NULL);
+    window = glfwCreateWindow(1000, 1000, "water_simulation", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to open window!" << std::endl;
         glfwTerminate();
@@ -113,7 +120,7 @@ int main() {
     GLuint floor_texture = util_create_texture("floor2.jpg");
     GLuint cube_texture = util_create_texture("red.jpg");
     GLuint flag_texture = util_create_texture("flag.jpg");
-    
+    GLuint boat_texture = util_create_texture("core_boat.jpg");
     /*
      * Initialize the shaders
      */
@@ -124,21 +131,18 @@ int main() {
 
     glUseProgram(0);
 
-    float previous_time = glfwGetTime();
+    double previous_time = glfwGetTime();
 
     bool is_drawing_continous = true;
     bool is_Q_key_down = false;
-    bool is_right_key_down = false;
-    bool is_left_key_down = false;
-    bool is_up_key_down = false;
-    bool is_down_key_down = false;
+ 
 
     
 
 
 
-    float dx  = 0.0000001;
-    float dy  = 0.0000001;
+    double dx  = 0.0000001;
+    double dy  = 0.0000001;
 
 
     while (!glfwWindowShouldClose(window)) {
@@ -163,77 +167,83 @@ int main() {
         /*
          * Figure out how long the last frame was.
          */
-        float current_time = glfwGetTime();
-        float elapsed_time = current_time - previous_time;
+        double current_time = glfwGetTime();
+        double elapsed_time = current_time - previous_time;
 
         
         
         //core of boat
-        glUseProgram(rectangle_shader.program);
-
-        
-
-
-        vec3 position(2.58 + dx, 1 + dy, 0.11);
-        vec3 scale(7.0, 10.0, 0.1);
-
-        mat4 model_mat = mat4::translation(position) * mat4::scale(scale) * mat4::rotation_z(M_PI / 4);
-
-        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
-        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
-        
-
-        glBindVertexArray(rectangle.vao);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
-        glBindVertexArray(0);
+        {
+            glUseProgram(rectangle_shader.program);
 
 
 
-        glUseProgram(0);
+
+            vec3 position(2.58 + dx, 1 + dy, 0.11);
+            vec3 scale(7.0, 10.0, 0.1);
+
+            mat4 model_mat = mat4::translation(position) * mat4::scale(scale) * mat4::rotation_z(M_PI / 4);
+
+            glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
+            glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+            glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+            glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+           
+
+            glBindVertexArray(rectangle.vao);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
+            glBindVertexArray(0);
+
+
+
+            glUseProgram(0);
+        }
 
 
         //flag))
-        glUseProgram(cube_shader.program);
-        mat4 model_mat_boat1 = mat4::translation(vec3(2.54+dx, 0.6+dy, 0.86)) * mat4::scale(vec3(0.3, 0.3, 0.1)) * mat4::rotation_y(M_PI / 2) *mat4::rotation_z(M_PI / 2);
-        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
-        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat_boat1.m);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, flag_texture);
-
-        
-        glBindVertexArray(plane.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 100);
-        glBindVertexArray(0);
+        {
+            glUseProgram(cube_shader.program);
+            mat4 model_mat = mat4::translation(vec3(2.54 + dx, 0.6 + dy, 0.86)) * mat4::scale(vec3(0.3, 0.3, 0.1)) * mat4::rotation_y(M_PI / 2) * mat4::rotation_z(M_PI / 2);
+            glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+            glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+            glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, flag_texture);
 
 
+            glBindVertexArray(plane.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 100);
+            glBindVertexArray(0);
 
 
-        glUseProgram(0);
+
+
+            glUseProgram(0);
+        }
                 
         //parus
-        glUseProgram(rectangle_shader.program);
+        {
+            glUseProgram(rectangle_shader.program);
 
 
 
 
-        vec3 position_2(2.58 + dx, 1 + dy, 0.11);
-        vec3 scale_2(0.6, 0.6, 0.8);
+            vec3 position_2(2.58 + dx, 1 + dy, 0.11);
+            vec3 scale_2(0.6, 0.6, 0.8);
 
-        mat4 model_mat_boat2 = mat4::translation(position_2) * mat4::scale(scale_2);
+            mat4 model_mat = mat4::translation(position_2) * mat4::scale(scale_2);
 
-        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
-        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat_boat2.m);
-        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+            glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
+            glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+            glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+            glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
 
-        glBindVertexArray(rectangle.vao);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
-        glBindVertexArray(0);
-        
-        glUseProgram(0);
+            glBindVertexArray(rectangle.vao);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
+            glBindVertexArray(0);
+
+            glUseProgram(0);
+        }
         
 
 
@@ -594,32 +604,7 @@ int main() {
 
     
 
-        //int right_key_state = glfwGetKey(window, GLFW_KEY_RIGHT);
-       
-        //if (right_key_state == GLFW_PRESS && !is_right_key_down) {
-        //    is_right_key_down = true;
-
-        //    int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
-        //    int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
-
-
-
-        //    if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-        //        water_surface.u[i][j] = 0.2;// 1.2;
-        //        water_surface.u[i - 1][j - 1] = 0.1; //0.7
-        //        water_surface.u[i - 1][j] = 0.1; //0.7
-        //        water_surface.u[i - 1][j + 1] = 0.1; //0.7
-        //        water_surface.u[i + 1][j - 1] = 0.1; //0.7
-        //        water_surface.u[i + 1][j] = 0.1; // 0.7
-        //        water_surface.u[i + 1][j + 1] = 0.1; // 0.7
-        //        water_surface.u[i][j + 1] = 0.1; // 0.7
-        //        water_surface.u[i][j - 1] = 0.1; // 0.5
-        //    }
-        //    dy += 0.09;
-        //}
-        //if (right_key_state == GLFW_RELEASE) {
-        //    is_right_key_down = false;
-        //}
+      
         
         int state_l = glfwGetKey(window, GLFW_KEY_LEFT); 
         if (state_l == GLFW_PRESS) {
@@ -697,108 +682,12 @@ int main() {
             
         }
 
-        int state_d = glfwGetKey(window, GLFW_KEY_DOWN);
-        if (state_d == GLFW_PRESS) {
-            
-            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
-            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
-
-
-
-            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-                dx += 0.004;
-                water_surface.u[i][j] = 0.2;// 1.2;
-                water_surface.u[i - 1][j - 1] = 0.1; //0.7
-                water_surface.u[i - 1][j] = 0.1; //0.7
-                water_surface.u[i - 1][j + 1] = 0.1; //0.7
-                water_surface.u[i + 1][j - 1] = 0.1; //0.7
-                water_surface.u[i + 1][j] = 0.1; // 0.7
-                water_surface.u[i + 1][j + 1] = 0.1; // 0.7
-                water_surface.u[i][j + 1] = 0.1; // 0.7
-                water_surface.u[i][j - 1] = 0.1; // 0.5
-            }
-            else {
-                dx -= 0.1;
-            }
-        }
+        
 
         
             
 
-        /*int up_key_state = glfwGetKey(window, GLFW_KEY_UP);
-        if (up_key_state == GLFW_PRESS && !is_up_key_down) {
-            is_up_key_down = true;
-            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
-            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
-
-
-
-            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-                water_surface.u[i][j] = 0.2;
-                water_surface.u[i - 1][j - 1] = 0.1; 
-                water_surface.u[i - 1][j] = 0.1; 
-                water_surface.u[i - 1][j + 1] = 0.1; 
-                water_surface.u[i + 1][j - 1] = 0.1; 
-                water_surface.u[i + 1][j] = 0.1; 
-                water_surface.u[i + 1][j + 1] = 0.1; 
-                water_surface.u[i][j + 1] = 0.1; 
-                water_surface.u[i][j - 1] = 0.1; 
-            }
-            dx -= 0.09;
-        }
-        if (up_key_state == GLFW_RELEASE) {
-            is_up_key_down = false;
-        }*/
         
-        /*int down_key_state = glfwGetKey(window, GLFW_KEY_DOWN);
-        if (down_key_state == GLFW_PRESS && !is_down_key_down) {
-            is_down_key_down = true;
-            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
-            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
-
-
-
-            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-                water_surface.u[i][j] = 0.2;
-                water_surface.u[i - 1][j - 1] = 0.1;
-                water_surface.u[i - 1][j] = 0.1;
-                water_surface.u[i - 1][j + 1] = 0.1;
-                water_surface.u[i + 1][j - 1] = 0.1;
-                water_surface.u[i + 1][j] = 0.1;
-                water_surface.u[i + 1][j + 1] = 0.1;
-                water_surface.u[i][j + 1] = 0.1;
-                water_surface.u[i][j - 1] = 0.1;
-            }
-            dx += 0.09;
-        }
-        if (down_key_state == GLFW_RELEASE) {
-            is_down_key_down = false;
-        }*/
-
-        /*int left_key_state = glfwGetKey(window, GLFW_KEY_LEFT);
-        if (left_key_state == GLFW_PRESS && !is_left_key_down) {
-            is_left_key_down = true;
-            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
-            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
-
-
-
-            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-                water_surface.u[i][j] = 0.2;
-                water_surface.u[i - 1][j - 1] = 0.1;
-                water_surface.u[i - 1][j] = 0.1;
-                water_surface.u[i - 1][j + 1] = 0.1;
-                water_surface.u[i + 1][j - 1] = 0.1;
-                water_surface.u[i + 1][j] = 0.1;
-                water_surface.u[i + 1][j + 1] = 0.1;
-                water_surface.u[i][j + 1] = 0.1;
-                water_surface.u[i][j - 1] = 0.1;
-            }
-            dy -= 0.09;
-        }
-        if (left_key_state == GLFW_RELEASE) {
-            is_left_key_down = false;
-        }*/
         
         glfwPollEvents();
         glfwSwapBuffers(window);
