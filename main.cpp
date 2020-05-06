@@ -134,7 +134,7 @@ int main() {
     graphics::shader cube_shader("cube.vert", "cube.frag");
 
     graphics::shader water_shader("water.vert", "water.frag");
-    graphics::shader sphere_shader("sphere.vert", "sphere.frag");
+   
     
 
 
@@ -158,7 +158,7 @@ int main() {
     GLuint floor_texture = util_create_texture("floor2.jpg");
     GLuint cube_texture = util_create_texture("red.jpg");
     GLuint flag_texture = util_create_texture("flag.jpg");
-    GLuint boat_texture = util_create_texture("core_boat.jpg");
+    
     /*
      * Initialize the shaders
      */
