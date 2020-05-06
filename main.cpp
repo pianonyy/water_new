@@ -18,62 +18,16 @@
 #include "water_surface.h"
 #include "plane.h"
 #include "shader.h"
-#include "sphere.h"
-
-
-GLFWwindow* window;
-void input() {
-    glfwPollEvents();
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-        glfwSetWindowShouldClose(window, 1);
-    }
-
-
-}
 
 
 
 
-void drawCube()
-{
-    GLfloat vertices[] =
-    {
-        -1, -1, -1,   -1, -1,  1,   -1,  1,  1,   -1,  1, -1,
-        1, -1, -1,    1, -1,  1,    1,  1,  1,    1,  1, -1,
-        -1, -1, -1,   -1, -1,  1,    1, -1,  1,    1, -1, -1,
-        -1,  1, -1,   -1,  1,  1,    1,  1,  1,    1,  1, -1,
-        -1, -1, -1,   -1,  1, -1,    1,  1, -1,    1, -1, -1,
-        -1, -1,  1,   -1,  1,  1,    1,  1,  1,    1, -1,  1
-    };
 
-    GLfloat colors[] =
-    {
-        0, 0, 0,   0, 0, 1,   0, 1, 1,   0, 1, 0,
-        1, 0, 0,   1, 0, 1,   1, 1, 1,   1, 1, 0,
-        0, 0, 0,   0, 0, 1,   1, 0, 1,   1, 0, 0,
-        0, 1, 0,   0, 1, 1,   1, 1, 1,   1, 1, 0,
-        0, 0, 0,   0, 1, 0,   1, 1, 0,   1, 0, 0,
-        0, 0, 1,   0, 1, 1,   1, 1, 1,   1, 0, 1
-    };
 
-    static float alpha = 0;
-    //attempt to rotate cube
-    glRotatef(alpha, 0, 1, 0);
 
-    /* We have a color array and a vertex array */
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glColorPointer(3, GL_FLOAT, 0, colors);
 
-    /* Send data : 24 vertices */
-    glDrawArrays(GL_QUADS, 0, 24);
 
-    /* Cleanup states */
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    alpha += 1;
-}
+
 
 int main() {
 
@@ -84,7 +38,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-    window = glfwCreateWindow(1000, 1000, "water_simulation", NULL, NULL);
+    
+    GLFWwindow* window = glfwCreateWindow(1000, 1000, "water_simulation", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to open window!" << std::endl;
         glfwTerminate();
