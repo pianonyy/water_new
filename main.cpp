@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-#define X .525731112119133606
+#define X .525731112119133606 
 #define Z .850650808352039932
 
 #include<iostream>
@@ -31,6 +31,8 @@ void input() {
 
 
 }
+
+
 
 
 void drawCube()
@@ -112,33 +114,7 @@ int main() {
 
 
 
-    GLuint VertexBuffer, VertexArray, ElementBuffer, ShaderProgram;
-
-    GLfloat vertices[] = {
-            -0.5, 0.5, 0.5, 1.0, 0.0, 0.0,	// Front Top Left		- Red	- 0
-            0.5,  0.5, 0.5, 0.0, 1.0, 0.0,	// Front Top Right		- Green	- 1
-            0.5, -0.5, 0.5, 0.0, 0.0, 1.0,	// Front Bottom Right		- Blue	- 2
-            -0.5,-0.5, 0.5, 0.0, 1.0, 1.0,	// Front Bottom Left		- Cyan	- 3
-            -0.5, 0.5,-0.5, 1.0, 0.0, 1.0,	// Back Top Left		- Pink	- 4
-            0.5,  0.5,-0.5, 1.0, 1.0, 0.0,	// Back Top Right		- Yellow- 5
-            0.5, -0.5,-0.5, 0.1, 0.1, 0.1,	// Back Bottom Right		- White - 6
-            -0.5,-0.5,-0.5, 1.0, 1.0, 1.0,	// Back Bottom Left		- Gray  - 7
-    };
-
-    GLuint elements[]{
-            0,3,2,  //Front
-            2,1,0,
-            1,5,6,	//Right
-            6,2,1,
-            5,4,7,	//Left
-            7,6,5,
-            4,7,3,	//Back
-            3,0,4,
-            4,5,1,	//Top
-            1,0,4,
-            3,2,6,	//Bottom
-            6,7,3,
-    };
+  
 
 
     /*
@@ -158,6 +134,11 @@ int main() {
     graphics::shader rectangle_shader("rectangle.vert", "rectangle.frag");
     graphics::shader cube_shader("cube.vert", "cube.frag");
 
+    graphics::shader water_shader("water.vert", "water.frag");
+    graphics::shader sphere_shader("sphere.vert", "sphere.frag");
+    
+
+
 
     /*
      * Set up all the objects we draw
@@ -165,14 +146,20 @@ int main() {
     object3d::rectangle rectangle(vec3(0, 0, 0), vec3(0, 0, 1));
     object3d::water_surface water_surface;
     object3d::plane plane;
+    object3d::sphere sphere(2.0, 10, 10);
 
+    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "Version: " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     /*
      * Set up the textures
      */
     GLuint floor_texture = util_create_texture("floor2.jpg");
     GLuint cube_texture = util_create_texture("red.jpg");
-
+    GLuint flag_texture = util_create_texture("flag.jpg");
+    GLuint boat_texture = util_create_texture("core_boat.jpg");
     /*
      * Initialize the shaders
      */
@@ -187,18 +174,24 @@ int main() {
 
     bool is_drawing_continous = true;
     bool is_Q_key_down = false;
+    bool is_right_key_down = false;
+    bool is_left_key_down = false;
+    bool is_up_key_down = false;
+    bool is_down_key_down = false;
+
+    
 
 
 
-
-
+    float dx  = 0.0000001;
+    float dy  = 0.0000001;
 
 
     while (!glfwWindowShouldClose(window)) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+        
 
         /*
          * Check if Q key was pressed and invert whether we are drawing continuously
@@ -219,7 +212,80 @@ int main() {
         float current_time = glfwGetTime();
         float elapsed_time = current_time - previous_time;
 
+        
+        
+        //core of boat
+        glUseProgram(rectangle_shader.program);
+
+        
+
+
+        vec3 position(2.58 + dx, 1 + dy, 0.11);
+        vec3 scale(7.0, 10.0, 0.1);
+
+        mat4 model_mat = mat4::translation(position) * mat4::scale(scale) * mat4::rotation_z(M_PI / 4);
+
+        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
+        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, boat_texture);
+
+        glBindVertexArray(rectangle.vao);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
+        glBindVertexArray(0);
+
+
+
+        glUseProgram(0);
+
+
+        //flag))
+        glUseProgram(cube_shader.program);
+        mat4 model_mat_boat1 = mat4::translation(vec3(2.54+dx, 0.6+dy, 0.86)) * mat4::scale(vec3(0.3, 0.3, 0.1)) * mat4::rotation_y(M_PI / 2) *mat4::rotation_z(M_PI / 2);
+        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat_boat1.m);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, flag_texture);
+
+        
+        glBindVertexArray(plane.vao);
+        glDrawArrays(GL_TRIANGLES, 0, 100);
+        glBindVertexArray(0);
+
+
+
+
+        glUseProgram(0);
+                
+        //parus
+        glUseProgram(rectangle_shader.program);
+
+
+
+
+        vec3 position_2(2.58 + dx, 1 + dy, 0.11);
+        vec3 scale_2(0.6, 0.6, 0.8);
+
+        mat4 model_mat_boat2 = mat4::translation(position_2) * mat4::scale(scale_2);
+
+        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
+        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat_boat2.m);
+        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+
+        glBindVertexArray(rectangle.vao);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
+        glBindVertexArray(0);
+        
+        glUseProgram(0);
+        
+
+
         previous_time = current_time;
+        
 
         /*
          * Update the viewport (Really should not happen every frame, only if the width/height changes)
@@ -236,7 +302,7 @@ int main() {
          * Handle mouse clicks
          */
         {
-            static bool is_mouse_down = false;
+            static bool is_mouse_down = true;
 
             double xpos, ypos;
             glfwGetCursorPos(window, &xpos, &ypos);
@@ -249,23 +315,25 @@ int main() {
             if (mouse_state == GLFW_PRESS && !is_mouse_down) {
                 is_mouse_down = true;
 
-                if (mouse_intersection.x > -4.0 &&
-                    mouse_intersection.x < 4.0 &&
-                    mouse_intersection.y > -4.0 &&
-                    mouse_intersection.y < 4.0) {
-                    int i = (mouse_intersection.x + 4.0) / 8.0 * water_surface.width;
-                    int j = (mouse_intersection.y + 4.0) / 8.0 * water_surface.height;
-
+                if (mouse_intersection.x > -3.0 &&
+                    mouse_intersection.x < 3.0 &&
+                    mouse_intersection.y > -3.0 &&
+                    mouse_intersection.y < 3.0) {
+                    int i = (mouse_intersection.x + 3.0) / 6.0 * water_surface.width;
+                    int j = (mouse_intersection.y + 3.0) / 6.0 * water_surface.height;
+                    
+                        
+                    
                     if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
-                        water_surface.u[i][j] = 1.2;
-                        water_surface.u[i - 1][j - 1] = 0.7;
-                        water_surface.u[i - 1][j] = 0.7;
-                        water_surface.u[i - 1][j + 1] = 0.7;
-                        water_surface.u[i + 1][j - 1] = 0.7;
-                        water_surface.u[i + 1][j] = 0.7;
-                        water_surface.u[i + 1][j + 1] = 0.7;
-                        water_surface.u[i][j + 1] = 0.7;
-                        water_surface.u[i][j - 1] = 0.5;
+                        water_surface.u[i][j] = 0.6;// 1.2;
+                        water_surface.u[i - 1][j - 1] = 0.3; //0.7
+                        water_surface.u[i - 1][j] = 0.3; //0.7
+                        water_surface.u[i - 1][j + 1] = 0.3; //0.7
+                        water_surface.u[i + 1][j - 1] = 0.3; //0.7
+                        water_surface.u[i + 1][j] = 0.3; // 0.7
+                        water_surface.u[i + 1][j + 1] = 0.3; // 0.7
+                        water_surface.u[i][j + 1] = 0.3; // 0.7
+                        water_surface.u[i][j - 1] = 0.3; // 0.5
                     }
                 }
             }
@@ -274,62 +342,84 @@ int main() {
             }
         }
 
+       /* {
+                glUseProgram(rectangle_shader.program);
 
+                
 
+                        vec3 position(2.58, 1, -1);
+                        vec3 scale(7.0, 10.0, 0.1);
+
+                        mat4 model_mat = mat4::translation(position) * mat4::scale(scale);
+
+                        glUniform3f(rectangle_shader.color_location, 0.001, 0.943, 0.123);
+                        glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+                        glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+                        glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
+
+                        glBindVertexArray(rectangle.vao);
+                        glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
+                        glBindVertexArray(0);
+                    
+                
+
+                glUseProgram(0);
+        }*/
+
+        
+
+        
+        
         /*
           Draw sphere inside the water
         */
-        /*
-        {
+        
+        //{   glUseProgram(sphere_shader.program);
+        //   
+        //    glUniformMatrix4fv(floor_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+        //    glUniformMatrix4fv(floor_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
+        //    glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    GLfloat x, y, z, alpha, beta;
+        //    GLfloat radius = 60.0f;
+        //    int gradation = 20;
+        //    for (alpha = 0.0; alpha < M_PI; alpha += M_PI / gradation)
+        //    {
+        //        
+        //        
+        //        
+        //        for (beta = 0.0; beta < 2.01 * M_PI; beta += M_PI / gradation)
+        //        {
+        //            x = radius * cos(beta) * sin(alpha);
+        //            y = radius * sin(beta) * sin(alpha);
+        //            z = radius * cos(alpha);
+        //           
+        //            glBindVertexArray(x,y,z)
+        //            glVertex3f(x, y, z);
+        //            x = radius * cos(beta) * sin(alpha + M_PI / gradation);
+        //            y = radius * sin(beta) * sin(alpha + M_PI / gradation);
+        //            z = radius * cos(alpha + M_PI / gradation);
+        //            glVertex3f(x, y, z);
+        //            glDrawArrays(GL_TRIANGLES, 0, 18);
+        //        }
+        //       
+        //    }
+        //    glUseProgram(0);
 
-            GLfloat x, y, z, alpha, beta;
-            GLfloat radius = 60.0f;
-            int gradation = 20;
-            for (alpha = 0.0; alpha < M_PI; alpha += M_PI / gradation)
-            {
+        //    
 
-                glDrawArrays(GL_TRIANGLES, 0, 18);
-                glColor3f(0.4, 0.5, 0.3);
-                for (beta = 0.0; beta < 2.01 * M_PI; beta += M_PI / gradation)
-                {
-                    x = radius * cos(beta) * sin(alpha);
-                    y = radius * sin(beta) * sin(alpha);
-                    z = radius * cos(alpha);
-
-                    glVertex3f(x, y, z);
-                    x = radius * cos(beta) * sin(alpha + M_PI / gradation);
-                    y = radius * sin(beta) * sin(alpha + M_PI / gradation);
-                    z = radius * cos(alpha + M_PI / gradation);
-                    glVertex3f(x, y, z);
-                }
-
-            }
+        //}
+        
 
 
+        //
 
-        }
-        */
-
-
-
-        // {
         //
         //
-        //     glMatrixMode(GL_PROJECTION_MATRIX);
-        //     glLoadIdentity();
-        //
-        //
-        //     glMatrixMode(GL_MODELVIEW_MATRIX);
-        //     glTranslatef(0, 0, -5);
-        //     drawCube();
-        // }
-
-
 
         /*
-         * Draw the box
+         * Draw the box which contains the water
          */
-
+         
         {
             glUseProgram(floor_shader.program);
 
@@ -341,122 +431,154 @@ int main() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-
+            // Draw floor of water
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
-
+            // Set up uniforms for side 1 of water
             model_mat = mat4::translation(vec3(0, -3, -1)) * mat4::scale(vec3(3, 1, 2)) * mat4::rotation_x(M_PI / 2.0);
             glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-
+            // Draw side 1 of water left
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
-
+            // Set up uniforms for side 2 of water
             model_mat = mat4::translation(vec3(-3, 0, -1)) * mat4::scale(vec3(1, 3, 2)) * mat4::rotation_y(M_PI / 2.0);
             glUniformMatrix4fv(floor_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
 
-            
+            // Draw side 2 of water right
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
             glUseProgram(0);
 
-
+          
         }
 
-        /*
-        draw the bortik
-        */
+        //{
+
+
+        //    
+       
+
+
+        //    glUseProgram(cube_shader.program);
+
+        //    mat4 model_mat = mat4::translation(vec3(-0.9, -0.9, -1.0)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+        //    glUniformMatrix4fv(cube_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m); // down
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+        //    // Draw floor of water
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
+        //    glBindVertexArray(0);
+
+        //    // Set up uniforms for side 1 of water
+        //    model_mat = mat4::translation(vec3(-0.9, -3, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+        //    // Draw side 1 of water left far
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        //    glBindVertexArray(0);
+
+        //    //// Set up uniforms for side 2 of water
+        //    model_mat = mat4::translation(vec3(-3.0, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+        //    // Draw side 2 of water right far
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        //    glBindVertexArray(0);
+
+        //    //// Set up uniforms for side 2 of water
+        //    model_mat = mat4::translation(vec3(1.2, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+        //    // Draw side 2 of water right near
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        //    glBindVertexArray(0);
+
+        //    // Set up uniforms for side 1 of water
+        //    model_mat = mat4::translation(vec3(-0.9, 1.2, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+
+        //    // Draw side 1 of water left near
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        //    glBindVertexArray(0);
+
+        //    model_mat = mat4::translation(vec3(-0.9, -0.9, 1.2)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
+        //    glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, cube_texture);
+
+
+        //    // Draw side 1 of water high
+        //    glBindVertexArray(plane.vao);
+        //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        //    glBindVertexArray(0);
+
+        //    glUseProgram(0);
+        //}
 
         {
+            glUseProgram(water_shader.program);
 
-
-
-
-
-
-            glUseProgram(cube_shader.program);
-
-            mat4 model_mat = mat4::translation(vec3(-0.9, -0.9, -1.0)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
-            glUniformMatrix4fv(cube_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m); // down
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-            // Draw floor of water
-            glBindVertexArray(plane.vao);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 30);
-            glBindVertexArray(0);
+          
 
             // Set up uniforms for side 1 of water
-            model_mat = mat4::translation(vec3(-0.9, -3, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
+            mat4 model_mat1 = mat4::translation(vec3(0, 3, -1.5)) * mat4::scale(vec3(3, 1, 1.5)) * mat4::rotation_x(M_PI / 2.0);
+            
+            glUniformMatrix4fv(water_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
+            glUniformMatrix4fv(water_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m); //
+            glUniformMatrix4fv(water_shader.model_mat_location, 1, GL_TRUE, model_mat1.m);
 
-            // Draw side 1 of water left far
+            // Draw side 1 of water left
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
-            //// Set up uniforms for side 2 of water
-            model_mat = mat4::translation(vec3(-3.0, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-            // Draw side 2 of water right far
-            glBindVertexArray(plane.vao);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-            glBindVertexArray(0);
-
-            //// Set up uniforms for side 2 of water
-            model_mat = mat4::translation(vec3(1.2, -0.9, 0.1)) * mat4::scale(vec3(0.1, 2.1, 1.1)) * mat4::rotation_y(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-            // Draw side 2 of water right near
-            glBindVertexArray(plane.vao);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-            glBindVertexArray(0);
-
-            // Set up uniforms for side 1 of water
-            model_mat = mat4::translation(vec3(-0.9, 1.2, 0.1)) * mat4::scale(vec3(2.1, 0.1, 1.1)) * mat4::rotation_x(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
+            // Set up uniforms for side 2 of water
+            model_mat1 = mat4::translation(vec3(3, 0, -1.5)) * mat4::scale(vec3(1, 3, 1.5)) * mat4::rotation_y(M_PI / 2.0);
+            glUniformMatrix4fv(water_shader.model_mat_location, 1, GL_TRUE, model_mat1.m);
 
 
-            // Draw side 1 of water left near
-            glBindVertexArray(plane.vao);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
-            glBindVertexArray(0);
-
-            model_mat = mat4::translation(vec3(-0.9, -0.9, 1.2)) * mat4::scale(vec3(2.1, 2.1, 0.1)) * mat4::rotation_z(M_PI / 2.0);
-            glUniformMatrix4fv(cube_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cube_texture);
-
-
-            // Draw side 1 of water high
+            // Draw side 2 of water right
             glBindVertexArray(plane.vao);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
             glBindVertexArray(0);
 
             glUseProgram(0);
-        }
 
+
+
+
+        }
+        
+            
+           
         water_surface.update(elapsed_time);
 
         /*
@@ -488,7 +610,7 @@ int main() {
 
             glUseProgram(0);
         }
-
+        
 
         /*
          * Draw a continous representation of the water surface
@@ -496,7 +618,7 @@ int main() {
         if (is_drawing_continous) {
             glUseProgram(surface_shader.program);
 
-
+            // Set up uniforms for water surface
             mat4 model_mat = mat4::identity();
             glUniformMatrix4fv(surface_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
             glUniformMatrix4fv(surface_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
@@ -505,9 +627,9 @@ int main() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floor_texture);
             glActiveTexture(GL_TEXTURE1);
+           
 
-
-
+            // Draw the water surface
             glBindVertexArray(water_surface.vao);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, water_surface.elements_vbo);
             glDrawElements(GL_TRIANGLES, (water_surface.N - 1) * (water_surface.N - 1) * 3 * 3, GL_UNSIGNED_INT, 0);
@@ -515,13 +637,216 @@ int main() {
 
             glUseProgram(0);
         }
+        
+
+    
+
+        //int right_key_state = glfwGetKey(window, GLFW_KEY_RIGHT);
+       
+        //if (right_key_state == GLFW_PRESS && !is_right_key_down) {
+        //    is_right_key_down = true;
+
+        //    int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+        //    int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
 
 
 
+        //    if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+        //        water_surface.u[i][j] = 0.2;// 1.2;
+        //        water_surface.u[i - 1][j - 1] = 0.1; //0.7
+        //        water_surface.u[i - 1][j] = 0.1; //0.7
+        //        water_surface.u[i - 1][j + 1] = 0.1; //0.7
+        //        water_surface.u[i + 1][j - 1] = 0.1; //0.7
+        //        water_surface.u[i + 1][j] = 0.1; // 0.7
+        //        water_surface.u[i + 1][j + 1] = 0.1; // 0.7
+        //        water_surface.u[i][j + 1] = 0.1; // 0.7
+        //        water_surface.u[i][j - 1] = 0.1; // 0.5
+        //    }
+        //    dy += 0.09;
+        //}
+        //if (right_key_state == GLFW_RELEASE) {
+        //    is_right_key_down = false;
+        //}
+        
+        int state_l = glfwGetKey(window, GLFW_KEY_LEFT); 
+        if (state_l == GLFW_PRESS) {
+            
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
 
 
 
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                dy -= 0.004;
+                water_surface.u[i][j] = 0.2;// 1.2;
+                water_surface.u[i - 1][j - 1] = 0.1; //0.7
+                water_surface.u[i - 1][j] = 0.1; //0.7
+                water_surface.u[i - 1][j + 1] = 0.1; //0.7
+                water_surface.u[i + 1][j - 1] = 0.1; //0.7
+                water_surface.u[i + 1][j] = 0.1; // 0.7
+                water_surface.u[i + 1][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j - 1] = 0.1; // 0.5
+            }
+            else {
+                dy += 0.1;
+            }
+        }
 
+        int state_r = glfwGetKey(window, GLFW_KEY_RIGHT);
+        if (state_r == GLFW_PRESS) {
+            
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                dy += 0.004;
+                water_surface.u[i][j] = 0.2;// 1.2;
+                water_surface.u[i - 1][j - 1] = 0.1; //0.7
+                water_surface.u[i - 1][j] = 0.1; //0.7
+                water_surface.u[i - 1][j + 1] = 0.1; //0.7
+                water_surface.u[i + 1][j - 1] = 0.1; //0.7
+                water_surface.u[i + 1][j] = 0.1; // 0.7
+                water_surface.u[i + 1][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j - 1] = 0.1; // 0.5
+            }
+            else {
+                dy -= 0.1;
+            }
+        }
+
+        int state_u = glfwGetKey(window, GLFW_KEY_UP);
+        if (state_u == GLFW_PRESS) {
+            
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                dx -= 0.004;
+                water_surface.u[i][j] = 0.2;// 1.2;
+                water_surface.u[i - 1][j - 1] = 0.2; //0.7
+                water_surface.u[i - 1][j] = 0.2; //0.7
+                water_surface.u[i - 1][j + 1] = 0.2; //0.7
+                water_surface.u[i + 1][j - 1] = 0.2; //0.7
+                water_surface.u[i + 1][j] = 0.2; // 0.7
+                water_surface.u[i + 1][j + 1] = 0.2; // 0.7
+                water_surface.u[i][j + 1] = 0.2; // 0.7
+                water_surface.u[i][j - 1] = 0.1; // 0.5
+            }
+            else {
+                dx += 0.1;
+            }
+            
+        }
+
+        int state_d = glfwGetKey(window, GLFW_KEY_DOWN);
+        if (state_d == GLFW_PRESS) {
+            
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                dx += 0.004;
+                water_surface.u[i][j] = 0.2;// 1.2;
+                water_surface.u[i - 1][j - 1] = 0.1; //0.7
+                water_surface.u[i - 1][j] = 0.1; //0.7
+                water_surface.u[i - 1][j + 1] = 0.1; //0.7
+                water_surface.u[i + 1][j - 1] = 0.1; //0.7
+                water_surface.u[i + 1][j] = 0.1; // 0.7
+                water_surface.u[i + 1][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j + 1] = 0.1; // 0.7
+                water_surface.u[i][j - 1] = 0.1; // 0.5
+            }
+            else {
+                dx -= 0.1;
+            }
+        }
+
+        
+            
+
+        /*int up_key_state = glfwGetKey(window, GLFW_KEY_UP);
+        if (up_key_state == GLFW_PRESS && !is_up_key_down) {
+            is_up_key_down = true;
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                water_surface.u[i][j] = 0.2;
+                water_surface.u[i - 1][j - 1] = 0.1; 
+                water_surface.u[i - 1][j] = 0.1; 
+                water_surface.u[i - 1][j + 1] = 0.1; 
+                water_surface.u[i + 1][j - 1] = 0.1; 
+                water_surface.u[i + 1][j] = 0.1; 
+                water_surface.u[i + 1][j + 1] = 0.1; 
+                water_surface.u[i][j + 1] = 0.1; 
+                water_surface.u[i][j - 1] = 0.1; 
+            }
+            dx -= 0.09;
+        }
+        if (up_key_state == GLFW_RELEASE) {
+            is_up_key_down = false;
+        }*/
+        
+        /*int down_key_state = glfwGetKey(window, GLFW_KEY_DOWN);
+        if (down_key_state == GLFW_PRESS && !is_down_key_down) {
+            is_down_key_down = true;
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                water_surface.u[i][j] = 0.2;
+                water_surface.u[i - 1][j - 1] = 0.1;
+                water_surface.u[i - 1][j] = 0.1;
+                water_surface.u[i - 1][j + 1] = 0.1;
+                water_surface.u[i + 1][j - 1] = 0.1;
+                water_surface.u[i + 1][j] = 0.1;
+                water_surface.u[i + 1][j + 1] = 0.1;
+                water_surface.u[i][j + 1] = 0.1;
+                water_surface.u[i][j - 1] = 0.1;
+            }
+            dx += 0.09;
+        }
+        if (down_key_state == GLFW_RELEASE) {
+            is_down_key_down = false;
+        }*/
+
+        /*int left_key_state = glfwGetKey(window, GLFW_KEY_LEFT);
+        if (left_key_state == GLFW_PRESS && !is_left_key_down) {
+            is_left_key_down = true;
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                water_surface.u[i][j] = 0.2;
+                water_surface.u[i - 1][j - 1] = 0.1;
+                water_surface.u[i - 1][j] = 0.1;
+                water_surface.u[i - 1][j + 1] = 0.1;
+                water_surface.u[i + 1][j - 1] = 0.1;
+                water_surface.u[i + 1][j] = 0.1;
+                water_surface.u[i + 1][j + 1] = 0.1;
+                water_surface.u[i][j + 1] = 0.1;
+                water_surface.u[i][j - 1] = 0.1;
+            }
+            dy -= 0.09;
+        }
+        if (left_key_state == GLFW_RELEASE) {
+            is_left_key_down = false;
+        }*/
+        
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
