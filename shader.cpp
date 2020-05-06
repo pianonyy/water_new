@@ -9,7 +9,7 @@ shader::shader(const char* vertex_shader_file, const char* fragment_shader_file)
     fseek(f, 0, SEEK_END);
     int l = ftell(f);
     fseek(f, 0, SEEK_SET);
-    char* vertex_shader_string = (char*)malloc(sizeof(char) * (l + 1));
+    char* vertex_shader_string = (char*)malloc(sizeof(char) * (l));
     fread(vertex_shader_string, sizeof(char), l, f);
     vertex_shader_string[l] = 0;
     fclose(f);
@@ -25,7 +25,7 @@ shader::shader(const char* vertex_shader_file, const char* fragment_shader_file)
     fseek(f, 0, SEEK_END);
     l = ftell(f);
     fseek(f, 0, SEEK_SET);
-    char* fragment_shader_string = (char*)malloc(sizeof(char) * (l + 1));
+    char* fragment_shader_string = (char*)malloc(sizeof(char) * (l));
     fread(fragment_shader_string, sizeof(char), l, f);
     fragment_shader_string[l] = 0;
     fclose(f);
