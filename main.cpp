@@ -1,7 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 
-#define X .525731112119133606 
-#define Z .850650808352039932
+
 
 #include<iostream>
 #include <stdlib.h>
@@ -146,7 +145,7 @@ int main() {
     object3d::rectangle rectangle(vec3(0, 0, 0), vec3(0, 0, 1));
     object3d::water_surface water_surface;
     object3d::plane plane;
-    object3d::sphere sphere(2.0, 10, 10);
+    
 
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
