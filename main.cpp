@@ -228,8 +228,7 @@ int main() {
         glUniformMatrix4fv(rectangle_shader.model_mat_location, 1, GL_TRUE, model_mat.m);
         glUniformMatrix4fv(rectangle_shader.view_mat_location, 1, GL_TRUE, view_mat.m);
         glUniformMatrix4fv(rectangle_shader.proj_mat_location, 1, GL_TRUE, proj_mat.m);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, boat_texture);
+        
 
         glBindVertexArray(rectangle.vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 100);
