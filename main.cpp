@@ -163,6 +163,7 @@ int main() {
         if (Q_key_state == GLFW_RELEASE) {
             is_Q_key_down = false;
         }
+        input();
         
 
         /*
