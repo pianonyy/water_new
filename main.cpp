@@ -1,7 +1,9 @@
+
 #define STB_IMAGE_IMPLEMENTATION
 
-#define X .525731112119133606 
-#define Z .850650808352039932
+
+
+
 
 #include<iostream>
 #include <stdlib.h>
@@ -9,7 +11,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <vector>
-#include "stb_image.h"
+
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -118,7 +120,6 @@ int main() {
      * Set up the textures
      */
     GLuint floor_texture = util_create_texture("floor2.jpg");
-    GLuint cube_texture = util_create_texture("red.jpg");
     GLuint flag_texture = util_create_texture("flag.jpg");
    
     /*
@@ -537,6 +538,32 @@ int main() {
                 dx += 0.1;
             }
             
+        }
+
+        int state_d = glfwGetKey(window, GLFW_KEY_DOWN);
+        if (state_d == GLFW_PRESS) {
+
+            int i = (2.58 + dx + 3.0) / 6.0 * water_surface.width;
+            int j = (1.0 + dy + 3.0) / 6.0 * water_surface.height;
+
+
+
+            if (i > 0 && j > 0 && i < water_surface.width - 1 && j < water_surface.height - 1) {
+                dx += 0.004;
+                water_surface.u[i][j] = 0.2;// 1.2;
+                water_surface.u[i - 1][j - 1] = 0.2; //0.7
+                water_surface.u[i - 1][j] = 0.2; //0.7
+                water_surface.u[i - 1][j + 1] = 0.2; //0.7
+                water_surface.u[i + 1][j - 1] = 0.2; //0.7
+                water_surface.u[i + 1][j] = 0.2; // 0.7
+                water_surface.u[i + 1][j + 1] = 0.2; // 0.7
+                water_surface.u[i][j + 1] = 0.2; // 0.7
+                water_surface.u[i][j - 1] = 0.1; // 0.5
+            }
+            else {
+                dx -= 0.1;
+            }
+
         }
 
         
